@@ -12,6 +12,13 @@ map = [
 
 def tabs_multiply(tab1,tab2):
     ret = []
+    if type(tab1) == int :
+        tab1 = [tab1]
+    if type(tab2) == int :
+        tab2 = [tab2]
+    if len(tab1)>len(tab2):
+        while len(tab1)<=len(tab2):
+            tab2.append(tab2)
     for i in range(len(tab1)):
         ret.append(tab1[i]*tab2[i])
     return ret
@@ -20,22 +27,26 @@ def sigmaoide(tab1):
     ret = 0
     for i in tab1:
         ret = i + ret
-    ret = 1/(1+5^(-((4)/(len(tab1)))*ret+2))
+    ret = 1 / (1 + 5 ** (-((4) / len(tab1)) * ret + 2))
+    return ret
+import random as rd
+
+def randparms(inputs, shema, out):
+    ret = []
+    
+    # Ajouter la première couche de poids
+    ret.append([[rd.random() for _ in range(inputs)] for _ in range(shema[0])])
+    
+    # Ajouter les couches de poids suivantes
+    for i in range(1, len(shema)):
+        ret.append([[rd.random() for _ in range(shema[i-1])] for _ in range(shema[i])])
+    
+    # Ajouter les couches de poids finale
+    for i in range(i, i + out):
+        ret.append([[rd.random() for _ in range(shema[i-1])] for _ in range(out)])
+        
     return ret
 
-def randparms(inputs,shema):
-    ret = [[]]
-    for a in range(shema[0]):
-        ret[0].append([])
-        for b in range(inputs):
-            ret[0][b-1].append(rd.random())
-    for a in range(len(shema[0:])):
-        ret.append([])
-        for b in range(shema[a]):
-            ret[a].append([])
-            for c in range(shema[a]):
-                ret[a][b-1].append(rd.random())
-    return ret
     
     
 
@@ -46,34 +57,37 @@ class neurone:
     def calcul(self,input):
         return(sigmaoide(tabs_multiply(self.parametres,input)))
 
-class ia:
+class IA:
     def __init__(self,parametres):
-        self.ia = [] 
+        self.neurones = [] 
         for i in range(len(parametres)):
-            self.ia.append([])
+            self.neurones.append([])
             for o in range(len(parametres[i])):
                 neu = parametres[i][o]
-                self.ia[i].append(neurone(neu))
+                self.neurones[i].append(neurone(neu))
+    
+    def calcul(self,input):
+        save = [input]
+        for a in range(len(self.neurones)):
+            save.append([])
+            for b in range(len(self.neurones[a])):
+                save[a+1].append(self.neurones[a][b].calcul(save[a]))
+        return (save[-1][0])
 
 
-x = [
-    [
-     [0.6777980373282536, 0.2923926191547276, 0.9225279491060656, 0.788280734910441, 0.7425638851376677, 0.643867096718091, 0.7825596737373496], 
-     [0.5799543031473333, 0.9927523627598179, 0.7994746924851498, 0.5286339224658078], 
-     [0.3737853631449374], 
-     [0.003161661016414241, 0.8199266660485346, 0.9542211104620457], 
-     [], 
-     []
-    ],[
-     [0.8084921372634503, 0.9455080105580985, 0.09372713407608235, 0.8910759093640697, 0.28263868699760364, 0.9768943848084133], 
-     [0.03141203999861164, 0.9530118077655403, 0.45402049971263814], 
-     []
-    ],[
-     [0.4133280839846123, 0.4227781785902808, 0.8177121105201011, 0.8184489069208591, 0.9299930863791673, 0.8661186878194075], 
-     [0.1267709985381552, 0.445099673935628, 0.7506557975383288], 
-     []
-    ],[    
-    ]
-    ]
 
-print(randparms(2,[3,3,3]))
+
+with open("save.txt", "r") as f:
+    save = f.read()
+    if not save:
+        save = randparms(42,[3,3,3],1)
+    else:
+        save = eval(save)
+
+bot = IA(save)
+print(bot.calcul(4))
+
+
+bot = IA()
+ 
+print(bot.calcul(4))
