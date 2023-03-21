@@ -7,7 +7,7 @@ map = [
     [0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
+    [0,0,0,1,1,0,0],
 ]
 
 def tabs_multiply(tab1,tab2):
@@ -17,8 +17,8 @@ def tabs_multiply(tab1,tab2):
     if type(tab2) == int :
         tab2 = [tab2]
     if len(tab1)>len(tab2):
-        while len(tab1)<=len(tab2):
-            tab2.append(tab2)
+        while len(tab1)>len(tab2):
+            tab2 = tab2 + tab2
     for i in range(len(tab1)):
         ret.append(tab1[i]*tab2[i])
     return ret
@@ -47,7 +47,40 @@ def randparms(inputs, shema, out):
         
     return ret
 
-    
+Patern_list = [
+    [0,1],
+    [1,0],
+    [1,1],
+    [1,-1],
+]
+
+def test_pos(x,y,player,tab):
+    for i in range(4):
+        patern = Patern_list[i]
+        tx = x 
+        ty = y
+        another = True
+        num = 0
+        while another == True and tx >= 0 and tx <= len(tab[0]) and ty >= 0 and ty <= len(tab):
+            if tab[ty][tx] == player:
+                num =+1
+                ty =+ patern[0]
+                tx =+ patern[1]
+            else:
+                another = False
+        another = True
+        tx = x - patern[1]
+        ty = y - patern[0]
+        while another == True and tx >= 0 and tx <= len(tab[0]) and ty >= 0 and ty <= len(tab):
+            if tab[ty][tx] == player:
+                num =+1
+                ty =- patern[0]
+                tx =- patern[1]
+            else:
+                another = False
+        
+        print(num)
+
     
 
 class neurone:
@@ -74,9 +107,6 @@ class IA:
                 save[a+1].append(self.neurones[a][b].calcul(save[a]))
         return (save[-1][0])
 
-
-
-
 with open("save.txt", "r") as f:
     save = f.read()
     if not save:
@@ -84,10 +114,5 @@ with open("save.txt", "r") as f:
     else:
         save = eval(save)
 
-bot = IA(save)
-print(bot.calcul(4))
 
-
-bot = IA()
- 
-print(bot.calcul(4))
+test_pos(3,5,1,map)
