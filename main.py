@@ -46,6 +46,18 @@ def randparms(inputs, shema, out):
         
     return ret
 
+def place(player, line, map):
+    y = len(map) - 1  # -1 car les indices commencent à 0
+    while y >= 0 and map[y][line] != 0:  # Vérifier que y est dans les limites de map
+        y = y - 1
+        if y < 0:
+            line = line + 1
+            y = len(map) - 1
+            if line >= len(map[0]):
+                line = 0
+    if y >= 0:  # Si y est valide, mettre à jour la valeur de la liste
+        map[y][line] = player
+
 Patern_list = [
     [0,1],
     [1,0],
@@ -106,10 +118,13 @@ class IA:
 
 def setsave():
     with open("save.txt", "r") as f:
-    save = f.read()
-    if not save:
-        save = randparms(42,[3,3,3],1)
-    else:
-        save = eval(save)
+        save = f.read()
+        if not save:
+            save = randparms(42,[3,3,3],1)
+        else:
+            save = eval(save)
     return save
 
+def party(p1,p2):
+    if type(p1) == "IA" and type(p2) == "IA":
+        
