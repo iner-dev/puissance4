@@ -7,7 +7,7 @@ map = [
     [0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0],
-    [0,0,0,1,1,0,0],
+    [0,0,0,0,0,0,0],
 ]
 
 def tabs_multiply(tab1,tab2):
@@ -29,7 +29,6 @@ def sigmaoide(tab1):
         ret = i + ret
     ret = 1 / (1 + 5 ** (-((4) / len(tab1)) * ret + 2))
     return ret
-import random as rd
 
 def randparms(inputs, shema, out):
     ret = []
@@ -63,25 +62,23 @@ def test_pos(x,y,player,tab):
         num = 0
         while another == True and tx >= 0 and tx <= len(tab[0]) and ty >= 0 and ty <= len(tab):
             if tab[ty][tx] == player:
-                num =+1
-                ty =+ patern[0]
-                tx =+ patern[1]
+                num = num + 1
+                ty = ty + patern[0]
+                tx = tx + patern[1]
             else:
                 another = False
         another = True
-        tx = x - patern[1]
-        ty = y - patern[0]
+        tx = x 
+        ty = y 
         while another == True and tx >= 0 and tx <= len(tab[0]) and ty >= 0 and ty <= len(tab):
             if tab[ty][tx] == player:
-                num =+1
-                ty =- patern[0]
-                tx =- patern[1]
+                num = num + 1
+                ty = ty - patern[0]
+                tx = tx - patern[1]
             else:
                 another = False
-        
-        print(num)
-
-    
+        num = num - 1
+        return num
 
 class neurone:
     def __init__(self,parametres):
@@ -107,12 +104,12 @@ class IA:
                 save[a+1].append(self.neurones[a][b].calcul(save[a]))
         return (save[-1][0])
 
-with open("save.txt", "r") as f:
+def setsave():
+    with open("save.txt", "r") as f:
     save = f.read()
     if not save:
         save = randparms(42,[3,3,3],1)
     else:
         save = eval(save)
+    return save
 
-
-test_pos(3,5,1,map)
