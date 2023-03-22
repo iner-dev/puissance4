@@ -46,17 +46,18 @@ def randparms(inputs, shema, out):
         
     return ret
 
-def place(player, line, map):
-    y = len(map) - 1  # -1 car les indices commencent à 0
-    while y >= 0 and map[y][line] != 0:  # Vérifier que y est dans les limites de map
+def place(player, line, Local_map):
+    y = len(Local_map) - 1  # -1 car les indices commencent à 0
+    while y >= 0 and Local_map[y][line] != 0:  # Vérifier que y est dans les limites de map
         y = y - 1
         if y < 0:
             line = line + 1
-            y = len(map) - 1
-            if line >= len(map[0]):
+            y = len(Local_map) - 1
+            if line >= len(Local_map[0]):
                 line = 0
     if y >= 0:  # Si y est valide, mettre à jour la valeur de la liste
-        map[y][line] = player
+        Local_map[y][line] = player
+        return [line,y]
 
 Patern_list = [
     [0,1],
@@ -66,13 +67,14 @@ Patern_list = [
 ]
 
 def test_pos(x,y,player,tab):
+    ret = False
     for i in range(4):
         patern = Patern_list[i]
         tx = x 
         ty = y
         another = True
         num = 0
-        while another == True and tx >= 0 and tx <= len(tab[0]) and ty >= 0 and ty <= len(tab):
+        while another == True and tx >= 0 and tx <= (len(tab[0])-1) and ty >= 0 and ty <= (len(tab)-1):
             if tab[ty][tx] == player:
                 num = num + 1
                 ty = ty + patern[0]
@@ -82,7 +84,7 @@ def test_pos(x,y,player,tab):
         another = True
         tx = x 
         ty = y 
-        while another == True and tx >= 0 and tx <= len(tab[0]) and ty >= 0 and ty <= len(tab):
+        while another == True and tx >= 0 and tx <= (len(tab[0])-1) and ty >= 0 and ty <= (len(tab)-1):
             if tab[ty][tx] == player:
                 num = num + 1
                 ty = ty - patern[0]
@@ -90,7 +92,9 @@ def test_pos(x,y,player,tab):
             else:
                 another = False
         num = num - 1
-        return num
+        if num >= 4 :
+            ret = True
+    return ret
 
 class neurone:
     def __init__(self,parametres):
@@ -125,6 +129,47 @@ def setsave():
             save = eval(save)
     return save
 
-def party(p1,p2):
-    if type(p1) == "IA" and type(p2) == "IA":
-        
+def map_to_ia(map):
+    ret = []
+    for i in map :
+        for o in i:
+            ret.append(o)
+    return ret
+
+def party(p1,p2,map):
+    local_map = map
+    win = 0
+    log = []
+    while win == 0:
+        coup = int(p1.calcul(map_to_ia(local_map))*6)
+        log.append(coup)
+        if coup == 6 : coup = 5
+        pos = place(1,coup,local_map)
+        if test_pos(pos[0],pos[1],1,local_map): win = 1
+
+        coup = int(p2.calcul(map_to_ia(local_map))*6)
+        log.append(coup)
+        if coup == 6 : coup = 5
+        pos = place(2,coup,local_map)
+        if test_pos(pos[0],pos[1],2,local_map) and win == 0 : win = 2
+    return [win,log]
+
+def print_map(l_map):
+    for o in l_map:
+        print(o)
+
+def vue_party(log):
+    local_map = map
+    tour = 0
+    for i in log:
+        print("-------------------")
+        tour = tour + 1
+        if tour % 2 == 1 :
+            place(1,i,local_map)
+        else:
+            place(2,i,local_map)
+
+ia1 = IA(randparms(42,[3,3],1))
+ia2 = IA(randparms(42,[3,3],1))
+party(ia1,ia2,map)
+print_map(map)
