@@ -106,7 +106,6 @@ class neurone:
     
     def variation(self,Coef):
         for i in range(len(self.parametres)):
-            print(i)
             self.parametres[i-1] = self.parametres[i-1] + ((rd.random()-0.5)*Coef*2)
 
 class IA:
@@ -131,14 +130,14 @@ class IA:
             for o in i :
                 o.variation(coef)
 
-def setsave():
-    with open("save.txt", "r") as f:
-        save = f.read()
-        if not save:
-            save = randparms(42,[3,3,3],1)
-        else:
-            save = eval(save)
-    return save
+    def compil(self):
+        ret = []
+        for i in range(len(self.neurones)):
+            i = i - 1 
+            ret.append([])
+            for o in self.neurones[i]:
+                ret[i].append(o.parametres)
+        return ret
 
 def map_to_ia(map):
     ret = []
@@ -151,6 +150,7 @@ def party(p1,p2,map):
     local_map = list(map)
     win = 0
     log = []
+    turns = 0
     while win == 0:
         coup = int(p1.calcul(map_to_ia(local_map))*6)
         log.append(coup)
@@ -165,13 +165,19 @@ def party(p1,p2,map):
         if coup == 6 : coup = 5
         pos = place(2,coup,local_map)
         if test_pos(pos[0],pos[1],2,local_map) : win = 2
+
+        turns = turns + 2
+
+        if turns >= 42 :
+            win = None
+            break
     return [win,log]
 
 def print_map(l_map):
     for o in l_map:
         print(o)
 
-def read_log(log):
+def read_log(log,type = "normal"):
     local_map = Normal_map()
     joueur = 0
     tours = 0
@@ -182,15 +188,40 @@ def read_log(log):
             tours = tours + 1
         else:
             place(2,i,local_map)
+        if type == "normal":
+            print("-------------------")
+            print_map(local_map)
+    if type == "normal" or type == "minimal":
         print("-------------------")
-        print_map(local_map)
-    print("-------------------")
-    print(f"J{log[0]} win at {tours} turns")
-    print("-------------------")
+        print(f"J{log[0]} win at {tours} turns")
+        print("-------------------")
+    return [log[0],tours,log[1]]
 
-ia1 = IA(randparms(42,[3,3],1))
-ia2 = IA(randparms(42,[3,3],1))
-ret = party(ia1,ia2,Normal_map())
+def setsave(liste):
+    with open("save.py", "w") as f:
+        f.write("\n".join(liste))
 
-print(ret)
-read_log(ret)
+def getsave():
+    with open("save.py", "r") as f:
+        save = f.read()
+        if not save: # save format is [[train evolve],IA parms]
+            save = [[1],randparms(42,[20,10,5],1)]
+        else:
+            save = eval(save)
+    return save
+
+def train(save,iteration,deep = 1000,readlog_see = "None"):
+    for i in range(iteration):
+        ia = IA(save[1])
+        variantes = []
+        coef = 1/save[0][0]
+        print(i)
+        for o in range(deep):
+            o = o - 1
+            variantes.append([IA(save[1])])
+            variantes[o][0].variation(coef)
+            result = party(ia,variantes[o][0],Normal_map())
+            variantes[o].append(read_log(result,readlog_see))
+    
+
+train(getsave(),1,100)
