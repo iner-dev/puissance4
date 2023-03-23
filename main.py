@@ -1,14 +1,15 @@
 import random as rd
 
 
-map = [
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-]
+def Normal_map():
+    return [
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+    ]
 
 def tabs_multiply(tab1,tab2):
     ret = []
@@ -155,13 +156,15 @@ def party(p1,p2,map):
         log.append(coup)
         if coup == 6 : coup = 5
         pos = place(1,coup,local_map)
-        if test_pos(pos[0],pos[1],1,local_map): win = 1
+        if test_pos(pos[0],pos[1],1,local_map): 
+            win = 1 
+            break
 
         coup = int(p2.calcul(map_to_ia(local_map))*6)
         log.append(coup)
         if coup == 6 : coup = 5
         pos = place(2,coup,local_map)
-        if test_pos(pos[0],pos[1],2,local_map) and win == 0 : win = 2
+        if test_pos(pos[0],pos[1],2,local_map) : win = 2
     return [win,log]
 
 def print_map(l_map):
@@ -169,20 +172,25 @@ def print_map(l_map):
         print(o)
 
 def read_log(log):
-    local_map = list(map)
-    tour = 0
-    for i in log:
-        print("-------------------")
-        tour = tour + 1
-        if tour % 2 == 1 :
+    local_map = Normal_map()
+    joueur = 0
+    tours = 0
+    for i in log[1]:
+        joueur = joueur + 1
+        if joueur % 2 == 1 :
             place(1,i,local_map)
+            tours = tours + 1
         else:
             place(2,i,local_map)
+        print("-------------------")
+        print_map(local_map)
+    print("-------------------")
+    print(f"J{log[0]} win at {tours} turns")
+    print("-------------------")
 
 ia1 = IA(randparms(42,[3,3],1))
 ia2 = IA(randparms(42,[3,3],1))
-ret = party(ia1,ia2,map)
+ret = party(ia1,ia2,Normal_map())
 
-print(ia1.neurones[1][0].parametres)
-ia1.variation(1)
-print(ia1.neurones[1][0].parametres)
+print(ret)
+read_log(ret)
