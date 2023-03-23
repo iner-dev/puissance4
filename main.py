@@ -102,6 +102,11 @@ class neurone:
     
     def calcul(self,input):
         return(sigmaoide(tabs_multiply(self.parametres,input)))
+    
+    def variation(self,Coef):
+        for i in range(len(self.parametres)):
+            print(i)
+            self.parametres[i-1] = self.parametres[i-1] + ((rd.random()-0.5)*Coef*2)
 
 class IA:
     def __init__(self,parametres):
@@ -119,6 +124,11 @@ class IA:
             for b in range(len(self.neurones[a])):
                 save[a+1].append(self.neurones[a][b].calcul(save[a]))
         return (save[-1][0])
+    
+    def variation(self,coef):
+        for i in self.neurones : 
+            for o in i :
+                o.variation(coef)
 
 def setsave():
     with open("save.txt", "r") as f:
@@ -137,7 +147,7 @@ def map_to_ia(map):
     return ret
 
 def party(p1,p2,map):
-    local_map = map
+    local_map = list(map)
     win = 0
     log = []
     while win == 0:
@@ -158,8 +168,8 @@ def print_map(l_map):
     for o in l_map:
         print(o)
 
-def vue_party(log):
-    local_map = map
+def read_log(log):
+    local_map = list(map)
     tour = 0
     for i in log:
         print("-------------------")
@@ -171,5 +181,8 @@ def vue_party(log):
 
 ia1 = IA(randparms(42,[3,3],1))
 ia2 = IA(randparms(42,[3,3],1))
-party(ia1,ia2,map)
-print_map(map)
+ret = party(ia1,ia2,map)
+
+print(ia1.neurones[1][0].parametres)
+ia1.variation(1)
+print(ia1.neurones[1][0].parametres)
