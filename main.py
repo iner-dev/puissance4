@@ -1,6 +1,5 @@
 import random as rd
 
-
 def Normal_map():
     return [
         [0,0,0,0,0,0,0],
@@ -212,8 +211,9 @@ def getsave():
             save = eval(save)
     return save
 
-def train(save,iteration,deep = 1000,readlog_see = "None"):
+def train(iteration,deep = 1000,readlog_see = "None"):
     for i in range(iteration):
+        save = getsave()
         ia = IA(save[1])
         variantes = []
         tours = 43
@@ -231,17 +231,14 @@ def train(save,iteration,deep = 1000,readlog_see = "None"):
             if variantes[o][1][1] < tours:
                 tours = variantes[o][1][1]
                 if variantes[o][1][0] != None :
-                    if variantes[o][1][0] == 1 :
-                        id = -1
-                    elif variantes[o][1][0] == 2 :
-                        id = o
-        
-        if id == -1 :
+                    id = o
+        if id == -1 or variantes[id][1][0] == 1 :
             selected = ia
         else :
             selected = variantes[id][0]
             modif = modif + 1
         setsave([[modif],selected.compil()])
+        if id != -1 and readlog_see == "Best":
+            read_log([variantes[id][1][0],variantes[id][1][2]])
 
-
-train(getsave(),100,1000,"None")
+train(100,1000,"Best")
