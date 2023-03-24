@@ -119,11 +119,11 @@ class IA:
     
     def calcul(self,input):
         save = [input]
-        for a in range(len(self.neurones)):
+        for a in range(len(self.neurones)-1):
             save.append([])
             for b in range(len(self.neurones[a])):
                 save[a+1].append(self.neurones[a][b].calcul(save[a]))
-        return (save[-1][0])
+        return (save[len(save)-1][0])
     
     def variation(self,coef):
         for i in self.neurones : 
@@ -195,13 +195,13 @@ def read_log(log,type = "Normal"):
         print("-------------------")
         print(f"J{log[0]} win at {tours} turns")
         if type == "DT":
-            print(f"{[log[0],tours,log[1]]}")
+            print(log)
         print("-------------------")
     return [log[0],tours,log[1]]
 
 def setsave(liste):
     with open("save.py", "w") as f:
-        f.write("\n".join(liste))
+        f.write(f"{liste}")
 
 def getsave():
     with open("save.py", "r") as f:
@@ -216,7 +216,10 @@ def train(save,iteration,deep = 1000,readlog_see = "None"):
     for i in range(iteration):
         ia = IA(save[1])
         variantes = []
+        tours = 43
+        id = -1
         coef = 1/save[0][0]
+        modif = save[0][0]
         print(f"iteration = {i}")
         for o in range(deep):
             o = o - 1
@@ -224,6 +227,21 @@ def train(save,iteration,deep = 1000,readlog_see = "None"):
             variantes[o][0].variation(coef)
             result = party(ia,variantes[o][0],Normal_map())
             variantes[o].append(read_log(result,readlog_see))
-    
 
-train(getsave(),10,10,"DT")
+            if variantes[o][1][1] < tours:
+                tours = variantes[o][1][1]
+                if variantes[o][1][0] != None :
+                    if variantes[o][1][0] == 1 :
+                        id = -1
+                    elif variantes[o][1][0] == 2 :
+                        id = o
+        
+        if id == -1 :
+            selected = ia
+        else :
+            selected = variantes[id][0]
+            modif = modif + 1
+        setsave([[modif],selected.compil()])
+
+
+train(getsave(),100,1000,"None")
