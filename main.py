@@ -177,7 +177,7 @@ def print_map(l_map):
     for o in l_map:
         print(o)
 
-def read_log(log,type = "normal"):
+def read_log(log,type = "Normal"):
     local_map = Normal_map()
     joueur = 0
     tours = 0
@@ -188,12 +188,14 @@ def read_log(log,type = "normal"):
             tours = tours + 1
         else:
             place(2,i,local_map)
-        if type == "normal":
+        if type == "Normal":
             print("-------------------")
             print_map(local_map)
-    if type == "normal" or type == "minimal":
+    if type == "Normal" or type == "minimal" or type == "DT":
         print("-------------------")
         print(f"J{log[0]} win at {tours} turns")
+        if type == "DT":
+            print(f"{[log[0],tours,log[1]]}")
         print("-------------------")
     return [log[0],tours,log[1]]
 
@@ -215,7 +217,7 @@ def train(save,iteration,deep = 1000,readlog_see = "None"):
         ia = IA(save[1])
         variantes = []
         coef = 1/save[0][0]
-        print(i)
+        print(f"iteration = {i}")
         for o in range(deep):
             o = o - 1
             variantes.append([IA(save[1])])
@@ -224,4 +226,4 @@ def train(save,iteration,deep = 1000,readlog_see = "None"):
             variantes[o].append(read_log(result,readlog_see))
     
 
-train(getsave(),1,100)
+train(getsave(),10,10,"DT")
