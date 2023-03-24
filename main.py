@@ -241,4 +241,4 @@ def train(iteration,deep = 1000,readlog_see = "None"):
         if id != -1 and readlog_see == "Best":
             read_log([variantes[id][1][0],variantes[id][1][2]])
 
-train(10,10000,"Best")
+train(100,10000,"Best")
