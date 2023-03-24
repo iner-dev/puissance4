@@ -145,7 +145,7 @@ def map_to_ia(map):
             ret.append(o)
     return ret
 
-def party(p1,p2,map):
+def party_training(p1,p2,map):
     local_map = list(map)
     win = 0
     log = []
@@ -225,7 +225,7 @@ def train(iteration,deep = 1000,readlog_see = "None"):
             o = o - 1
             variantes.append([IA(save[1])])
             variantes[o][0].variation(coef)
-            result = party(ia,variantes[o][0],Normal_map())
+            result = party_training(ia,variantes[o][0],Normal_map())
             variantes[o].append(read_log(result,readlog_see))
 
             if variantes[o][1][1] < tours:
@@ -241,4 +241,4 @@ def train(iteration,deep = 1000,readlog_see = "None"):
         if id != -1 and readlog_see == "Best":
             read_log([variantes[id][1][0],variantes[id][1][2]])
 
-train(100,1000,"Best")
+train(10,10000,"Best")
