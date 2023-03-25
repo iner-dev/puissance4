@@ -1,5 +1,9 @@
 import random as rd
 
+
+# PC / NumWorks
+executed_on = "PC"
+
 #     puissance 4
 #      by Iner
 
@@ -226,6 +230,12 @@ def getsave():
             save = eval(save)
     return save
 
+def afiche(type,donnes=None):
+    import kandinsky as ky
+    if type == "/100":
+        ky.fill_rect(10,10,300,100,ky.color(0,0,0))
+        ky.fill_rect(12,12,int(donnes[0]*296),96,ky.color(255-int(donnes[0]*255),int(donnes[0]*255),0))
+
 def train(iteration,deep = 1000,readlog_see = "None"):
     for i in range(iteration):
         save = getsave()
@@ -235,7 +245,9 @@ def train(iteration,deep = 1000,readlog_see = "None"):
         id = -1
         coef = 1/save[0][0]
         modif = save[0][0]
-        print("iteration =",i)
+        if readlog_see != "None" and executed_on == "PC" : print("iteration =",i+1)
+        if readlog_see == "/100" and executed_on == "PC" : print(100*i/iteration,"% to",100*(i+1)/iteration,"%")
+        if executed_on == "NumWorks" and readlog_see == "/100" :afiche("/100",[i/iteration])
         for o in range(deep):
             o = o - 1
             variantes.append([IA(save[1])])
@@ -261,6 +273,41 @@ def train(iteration,deep = 1000,readlog_see = "None"):
         setsave([[modif],selected.compil()])
         if id != -1 and readlog_see == "Best":
             read_log([variantes[id][1][0],variantes[id][1][2]])
-            print("ia is",variantes[id][2][0],"player")
 
-train(1000,1000,"Best")
+def mass_print(text):
+    for i in text : print(i) 
+
+def main():
+    mass_print([
+        "---------------------",
+        "     puissance 4",
+        "      by Iner",
+        "---------------------",
+        "  que veut tu faire",
+        "1 - entrainer l'ia",
+        "2 - une partie",
+        "---------------------"
+    ])
+    rep1 = eval(input("> "))
+    print("---------------------")
+    if rep1 == 1 :
+        print("et combien d'itérations")
+        print("---------------------")
+        rep2 = eval(input("> "))
+        mass_print([
+            "---------------------",
+            "quelle type d'afichage",
+            "1 - Best",
+            "2 - avancement",
+            "---------------------",
+        ])
+        rep3 = eval(input("> "))
+        print("---------------------")
+        rep_poss = {
+            1 : "Best",
+            2 : "/100"
+        }
+        train(rep2,1000,rep_poss.get(rep3))
+    
+        
+main()
