@@ -1,5 +1,18 @@
 import random as rd
 
+#     puissance 4
+#      by Iner
+
+#       ____  
+#      /    \ 
+#      \-73-/ 
+#       \78/  
+#        --   
+#       /69\  
+#      /-82-\ 
+#      \____/ 
+
+
 def Normal_map():
     return [
         [0,0,0,0,0,0,0],
@@ -94,6 +107,7 @@ def test_pos(x,y,player,tab):
         num = num - 1
         if num >= 4 :
             ret = True
+    
     return ret
 
 class neurone:
@@ -152,16 +166,16 @@ def party_training(p1,p2,map):
     turns = 0
     while win == 0:
         coup = int(p1.calcul(map_to_ia(local_map))*6)
-        log.append(coup)
         if coup == 6 : coup = 5
+        log.append(coup)
         pos = place(1,coup,local_map)
         if test_pos(pos[0],pos[1],1,local_map): 
             win = 1 
             break
 
         coup = int(p2.calcul(map_to_ia(local_map))*6)
-        log.append(coup)
         if coup == 6 : coup = 5
+        log.append(coup)
         pos = place(2,coup,local_map)
         if test_pos(pos[0],pos[1],2,local_map) : win = 2
 
@@ -170,6 +184,7 @@ def party_training(p1,p2,map):
         if turns >= 42 :
             win = None
             break
+        
     return [win,log]
 
 def print_map(l_map):
@@ -192,7 +207,7 @@ def read_log(log,type = "Normal"):
             print_map(local_map)
     if type == "Normal" or type == "minimal" or type == "DT":
         print("-------------------")
-        print(f"J{log[0]} win at {tours} turns")
+        print("J",log[0],"win at",tours,"turns")
         if type == "DT":
             print(log)
         print("-------------------")
@@ -200,7 +215,7 @@ def read_log(log,type = "Normal"):
 
 def setsave(liste):
     with open("save.py", "w") as f:
-        f.write(f"{liste}")
+        f.write(str(liste))
 
 def getsave():
     with open("save.py", "r") as f:
@@ -215,24 +230,30 @@ def train(iteration,deep = 1000,readlog_see = "None"):
     for i in range(iteration):
         save = getsave()
         ia = IA(save[1])
-        variantes = []
+        variantes = [] # [[l'ia variante,log lu,autres donnes -> [la palace de l'ia mere]],...]
         tours = 43
         id = -1
         coef = 1/save[0][0]
         modif = save[0][0]
-        print(f"iteration = {i}")
+        print("iteration =",i)
         for o in range(deep):
             o = o - 1
             variantes.append([IA(save[1])])
             variantes[o][0].variation(coef)
-            result = party_training(ia,variantes[o][0],Normal_map())
+            if rd.random() >= 0.5:
+                result = party_training(ia,variantes[o][0],Normal_map())
+                iap = 1
+            else :
+                result = party_training(variantes[o][0],ia,Normal_map())
+                iap = 2
             variantes[o].append(read_log(result,readlog_see))
+            variantes[o].append([iap])
 
             if variantes[o][1][1] < tours:
                 tours = variantes[o][1][1]
                 if variantes[o][1][0] != None :
                     id = o
-        if id == -1 or variantes[id][1][0] == 1 :
+        if id == -1 or variantes[id][1][0] == variantes[id][2][0] :
             selected = ia
         else :
             selected = variantes[id][0]
@@ -240,5 +261,6 @@ def train(iteration,deep = 1000,readlog_see = "None"):
         setsave([[modif],selected.compil()])
         if id != -1 and readlog_see == "Best":
             read_log([variantes[id][1][0],variantes[id][1][2]])
+            print("ia is",variantes[id][2][0],"player")
 
-train(1000,10000,"Best")
+train(1000,1000,"Best")
