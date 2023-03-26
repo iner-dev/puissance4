@@ -312,5 +312,5 @@ def main():
         }
         train(rep2,1000,rep_poss.get(rep3))
     
-        
-main()
+ia = IA(getsave())
+read_log(party_training(ia,ia,Normal_map()))
