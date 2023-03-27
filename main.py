@@ -224,8 +224,8 @@ def setsave(liste):
 def getsave():
     with open("save.py", "r") as f:
         save = f.read()
-        if not save: # save format is [[train evolve],IA parms]
-            save = [[1],randparms(42,[30,20,10,5,3],1)]
+        if not save: # save format is [[train evolve,time por mill],IA parms]
+            save = [[1,7],randparms(42,[30,20,10,5,3],1)]
         else:
             save = eval(save)
     return save
