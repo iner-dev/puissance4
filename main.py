@@ -288,10 +288,11 @@ def train(iteration,deep = 1000,readlog_see = "None"):
         else :
             selected = variantes[id][0]
             modif = modif + 1
-        time_por_mill = (t.time()-start_time)/iteration
         setsave([[modif,time_por_mill],selected.compil()])
         if id != -1 and readlog_see == "Best":
             read_log([variantes[id][1][0],variantes[id][1][2]])
+    time_por_mill = (t.time()-start_time)/iteration
+    setsave([[modif,time_por_mill],selected.compil()])
 
 def mass_print(text):
     for i in text : print(i) 
