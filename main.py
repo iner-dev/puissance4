@@ -1,5 +1,5 @@
 import random as rd
-
+import time as t
 
 # PC / NumWorks
 executed_on = "PC"
@@ -169,16 +169,16 @@ def party_training(p1,p2,map):
     log = []
     turns = 0
     while win == 0:
-        coup = int(p1.calcul(map_to_ia(local_map))*6)
-        if coup == 6 : coup = 5
+        coup = int(p1.calcul(map_to_ia(local_map))*7)
+        if coup == 7 : coup = 6
         log.append(coup)
         pos = place(1,coup,local_map)
         if test_pos(pos[0],pos[1],1,local_map): 
             win = 1 
             break
 
-        coup = int(p2.calcul(map_to_ia(local_map))*6)
-        if coup == 6 : coup = 5
+        coup = int(p2.calcul(map_to_ia(local_map))*7)
+        if coup == 7 : coup = 6
         log.append(coup)
         pos = place(2,coup,local_map)
         if test_pos(pos[0],pos[1],2,local_map) : win = 2
@@ -225,7 +225,7 @@ def getsave():
     with open("save.py", "r") as f:
         save = f.read()
         if not save: # save format is [[train evolve],IA parms]
-            save = [[1],randparms(42,[20,10,5],1)]
+            save = [[1],randparms(42,[30,20,10,5,3],1)]
         else:
             save = eval(save)
     return save
@@ -235,8 +235,23 @@ def afiche(type,donnes=None):
     if type == "/100":
         ky.fill_rect(10,10,300,100,ky.color(0,0,0))
         ky.fill_rect(12,12,int(donnes[0]*296),96,ky.color(255-int(donnes[0]*255),int(donnes[0]*255),0))
+    elif type == "map":
+        ky.fill_rect(49,19,210,180,ky.color(0,0,0))
+        for i in range(len(donnes[0])):
+            for o in range(len(donnes[0][i])):
+                color_tab = {
+                    0 : ky.color(255,255,255),
+                    1 : ky.color(0,255,0),
+                    2 : ky.color(0,0,255)
+                }
+                ky.fill_rect(o*30+50,i*30+20,28,28,color_tab.get(donnes[0][i][o]))
+    elif type == "curseur":
+        ky.fill_rect(50,5,210,10,ky.color(255,255,255))
+        ky.fill_rect(donnes[0]*30+30,5,10,10,ky.color(0,0,0))
 
 def train(iteration,deep = 1000,readlog_see = "None"):
+    time_por_mill = save[0][1]
+    start_time = int(t.time())
     for i in range(iteration):
         save = getsave()
         ia = IA(save[1])
@@ -248,7 +263,7 @@ def train(iteration,deep = 1000,readlog_see = "None"):
         if readlog_see != "None" and executed_on == "PC" : print("iteration =",i+1)
         if readlog_see == "/100" and executed_on == "PC" : print(100*i/iteration,"%")
         if executed_on == "NumWorks" and readlog_see == "/100" :afiche("/100",[i/iteration])
-        time_remain = (iteration-i)*deep*5.5/1000
+        time_remain = (iteration-i)*deep*time_por_mill/1000
         if readlog_see == "/100" and executed_on == "PC" : print("time remain =",int(time_remain/3600),"h",int(time_remain/60)%60,"and",int(time_remain)%60,"S")
         if readlog_see != "None" and executed_on == "PC" : print("---------------------")
         for o in range(deep):
@@ -273,12 +288,88 @@ def train(iteration,deep = 1000,readlog_see = "None"):
         else :
             selected = variantes[id][0]
             modif = modif + 1
-        setsave([[modif],selected.compil()])
+        time_por_mill = (int(t.time())-start_time())/iteration
+        setsave([[modif,time_por_mill],selected.compil()])
         if id != -1 and readlog_see == "Best":
             read_log([variantes[id][1][0],variantes[id][1][2]])
 
 def mass_print(text):
     for i in text : print(i) 
+
+def select(map):
+    import ion
+    end = False
+    ret = 7
+    while end == False:
+        afiche("map",[map])
+        afiche("curseur",[ret])
+        while True :
+            if ion.keydown(ion.KEY_LEFT):
+                ret = ret - 1
+                if ret < 1 : ret = 7
+                while ion.keydown(ion.KEY_LEFT): 
+                    jsp = 1
+                break
+            elif ion.keydown(ion.KEY_RIGHT):
+                ret = ret + 1
+                if ret > 7 : ret = 1
+                while ion.keydown(ion.KEY_RIGHT):
+                    jsp = 1
+                break
+            elif ion.keydown(ion.KEY_OK):
+                if ret > 7 : ret = 1
+                while ion.keydown(ion.KEY_OK):
+                    jsp = 1
+                end = True
+                break
+    return ret
+
+def Normal_party(type,map,ia = None):
+    local_map = list(map)
+    win = 0
+    log = []
+    turns = 0
+    while win == 0:
+        coup = select(local_map)
+        coup = coup - 1
+        if coup > 6 : coup = 6
+        if coup < 0 : coup = 0
+        log.append(coup)
+        pos = place(1,coup,local_map)
+        if test_pos(pos[0],pos[1],1,local_map): 
+            win = 1 
+            break
+
+        if type == "PVP":
+            coup = select(local_map)
+            coup = coup - 1
+            if coup > 6 : coup = 6
+            if coup < 0 : coup = 0
+        else:
+            coup = int(ia.calcul(map_to_ia(local_map))*7)
+            if coup == 7 : coup = 6
+        log.append(coup)
+        pos = place(2,coup,local_map)
+        if test_pos(pos[0],pos[1],2,local_map) : win = 2
+
+        turns = turns + 2
+
+        if turns >= 42 :
+            win = None
+            break
+    end = False
+    ret = 7
+    while end == False:
+        afiche("map",[map])
+        import ion
+        while True :
+            if ion.keydown(ion.KEY_OK):
+                if ret > 7 : ret = 1
+                while ion.keydown(ion.KEY_OK):
+                    jsp = 1
+                end = True
+                break
+    return [win,log]
 
 def main():
     mass_print([
@@ -311,6 +402,17 @@ def main():
             2 : "/100"
         }
         train(rep2,1000,rep_poss.get(rep3))
-    
-ia = IA(getsave())
-read_log(party_training(ia,ia,Normal_map()))
+    else:
+        mass_print([
+            "0 - PVP",
+            "1 - PVE",
+            "---------------------"
+        ])
+        rep2 = input("> ")
+        rep_type = {
+            1 : "PVP",
+            2 : "PVE"
+        }
+        Normal_party(rep_type.get(rep2),Normal_map())
+
+main()
