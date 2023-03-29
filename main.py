@@ -414,6 +414,6 @@ def main():
             1 : "PVP",
             2 : "PVE"
         }
-        Normal_party(rep_type.get(rep2),Normal_map())
+        Normal_party(rep_type.get(rep2),Normal_map(),IA(getsave()[1]))
 
 main() # time = 9.246827721595764
