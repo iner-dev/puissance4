@@ -416,4 +416,4 @@ def main():
         }
         Normal_party(rep_type.get(rep2),Normal_map())
 
-main()
+main() # time = 9.246827721595764
