@@ -225,7 +225,7 @@ def getsave():
     with open("save.py", "r") as f:
         save = f.read()
         if not save: # save format is [[train evolve,time por mill],IA parms]
-            save = [[1,7],randparms(42,[30,20,10,5,3],1)]
+            save = [[1,7],[randparms(42,[30,20,10,5,3],1),randparms(42,[30,20,10,5,3],1),randparms(42,[30,20,10,5,3],1),randparms(42,[30,20,10,5,3],1),randparms(42,[30,20,10,5,3],1)]]
         else:
             save = eval(save)
     return save
@@ -266,33 +266,22 @@ def train(iteration,deep = 1000,readlog_see = "None"):
         time_remain = (iteration-i)*deep*time_por_mill/1000
         if readlog_see != "None" and executed_on == "PC" : print("time remain =",int(time_remain/3600),"h",int(time_remain/60)%60,"and",int(time_remain)%60,"S")
         if readlog_see != "None" and executed_on == "PC" : print("---------------------")
-        for o in range(deep):
-            o = o - 1
-            variantes.append([IA(save[1])])
-            variantes[o][0].variation(coef)
-            if rd.random() >= 0.5:
-                result = party_training(ia,variantes[o][0],Normal_map())
-                iap = 1
-            else :
-                result = party_training(variantes[o][0],ia,Normal_map())
-                iap = 2
-            variantes[o].append(read_log(result,readlog_see))
-            variantes[o].append([iap])
-
-            if variantes[o][1][1] < tours:
-                tours = variantes[o][1][1]
-                if variantes[o][1][0] != None :
-                    id = o
-        if id == -1 or variantes[id][1][0] == variantes[id][2][0] :
-            selected = ia
-        else :
-            selected = variantes[id][0]
-            modif = modif + 1
-        setsave([[modif,time_por_mill],selected.compil()])
-        if id != -1 and readlog_see == "Best":
-            read_log([variantes[id][1][0],variantes[id][1][2]])
+        for o in range(4):
+            variantes.append([IA(save[1][o])])
+            for p in range(int(deep/5)):
+                p = p + 1
+                variantes.append(variantes[o][0])
+                variantes[o+p].variation(coef)
+        for o in variantes:
+            for p in range(4):
+                place = rd.randint(1,2)
+                if place == 1:
+                    ret =  read_log(party_training(o,variantes[rd.randint(0,len(variantes)-1)][0],Normal_map()),readlog_see)
+                else : 
+                    ret =  read_log(party_training(variantes[rd.randint(0,len(variantes)-1)][0],o,Normal_map()),readlog_see)
+        
     time_por_mill = (t.time()-start_time)/iteration
-    setsave([[modif,time_por_mill],selected.compil()])
+    setsave([[modif,time_por_mill],[,,,,]])
 
 def mass_print(text):
     for i in text : print(i) 
@@ -405,8 +394,8 @@ def main():
         train(rep2,1000,rep_poss.get(rep3))
     else:
         mass_print([
-            "0 - PVP",
-            "1 - PVE",
+            "1 - PVP",
+            "2 - PVE",
             "---------------------"
         ])
         rep2 = input("> ")
