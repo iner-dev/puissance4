@@ -249,7 +249,7 @@ def afiche(type,donnes=None):
         ky.fill_rect(50,5,210,10,ky.color(255,255,255))
         ky.fill_rect(donnes[0]*30+30,5,10,10,ky.color(0,0,0))
 
-def train(iteration,deep = 1000,readlog_see = "None"):
+def train(iteration,deep = 200,readlog_see = "None"):
     time_por_mill = getsave()[0][1]
     start_time = t.time()
     for i in range(iteration):
@@ -267,21 +267,35 @@ def train(iteration,deep = 1000,readlog_see = "None"):
         if readlog_see != "None" and executed_on == "PC" : print("time remain =",int(time_remain/3600),"h",int(time_remain/60)%60,"and",int(time_remain)%60,"S")
         if readlog_see != "None" and executed_on == "PC" : print("---------------------")
         for o in range(4):
-            variantes.append([IA(save[1][o])])
+            variantes.append(IA(save[1][o]))
             for p in range(int(deep/5)):
                 p = p + 1
-                variantes.append(variantes[o][0])
+                variantes.append(variantes[o])
                 variantes[o+p].variation(coef)
+        champion = []
         for o in variantes:
+            win = 0
+            points = 0
             for p in range(4):
                 place = rd.randint(1,2)
                 if place == 1:
-                    ret =  read_log(party_training(o,variantes[rd.randint(0,len(variantes)-1)][0],Normal_map()),readlog_see)
+                    ret =  read_log(party_training(o,variantes[rd.randint(0,len(variantes)-1)],Normal_map()),readlog_see)
                 else : 
-                    ret =  read_log(party_training(variantes[rd.randint(0,len(variantes)-1)][0],o,Normal_map()),readlog_see)
-        
+                    ret =  read_log(party_training(variantes[rd.randint(0,len(variantes)-1)],o,Normal_map()),readlog_see)
+                points = points + ret[1]
+                if ret[0]==place:
+                    win = win + 1
+            used = False
+            for i in range(len(champion)):
+                i = i - 1
+                if champion[i][1] > win or champion[i][2] < points:
+                    champion.insert(i-1,[o,win,points])
+                    used = True
+                    break
+            if used == False:
+                champion.insert(0,[o,win,points])
     time_por_mill = (t.time()-start_time)/iteration
-    setsave([[modif,time_por_mill],[,,,,]])
+    setsave([[modif,time_por_mill],[champion[0][0].compil(),champion[1][0].compil(),champion[2][0].compil(),champion[3][0].compil(),champion[4][0].compil()]])
 
 def mass_print(text):
     for i in text : print(i) 
@@ -405,4 +419,4 @@ def main():
         }
         Normal_party(rep_type.get(rep2),Normal_map(),IA(getsave()[1]))
 
-main() # time = 9.246827721595764
+main()
