@@ -254,10 +254,7 @@ def train(iteration,deep = 200,readlog_see = "None"):
     start_time = t.time()
     for i in range(iteration):
         save = getsave()
-        ia = IA(save[1])
         variantes = [] # [[l'ia variante,log lu,autres donnes -> [la palace de l'ia mere]],...]
-        tours = 43
-        id = -1
         coef = 1/save[0][0]
         modif = save[0][0]
         if readlog_see != "None" and executed_on == "PC" : print("iteration =",i+1)
@@ -295,6 +292,7 @@ def train(iteration,deep = 200,readlog_see = "None"):
             if used == False:
                 champion.insert(0,[o,win,points])
     time_por_mill = (t.time()-start_time)/iteration
+    modif = modif +1 
     setsave([[modif,time_por_mill],[champion[0][0].compil(),champion[1][0].compil(),champion[2][0].compil(),champion[3][0].compil(),champion[4][0].compil()]])
 
 def mass_print(text):
