@@ -17,7 +17,7 @@ executed_on = "PC"
 #      \____/ 
 
 
-def Normal_map():
+def Normal_map(): # carte de jeu de base
     return [
         [0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0],
@@ -27,7 +27,7 @@ def Normal_map():
         [0,0,0,0,0,0,0],
     ]
 
-def tabs_multiply(tab1,tab2):
+def tabs_multiply(tab1,tab2): # multiplie les elements de la tab1 par ceux de la tab 2
     ret = []
     if type(tab1) == int :
         tab1 = [tab1]
@@ -40,14 +40,14 @@ def tabs_multiply(tab1,tab2):
         ret.append(tab1[i]*tab2[i])
     return ret
 
-def sigmaoide(tab1):
+def sigmaoide(tab1): # fait la fonction sigma puis sigmoid
     ret = 0
     for i in tab1:
         ret = i + ret
     ret = 1 / (1 + 5 ** (-((4) / len(tab1)) * ret + 2))
     return ret
 
-def randparms(inputs, shema, out):
+def randparms(inputs, shema, out): # genere les parametres aleatoire d'une ia
     ret = []
     
     # Ajouter la première couche de poids
@@ -63,7 +63,7 @@ def randparms(inputs, shema, out):
         
     return ret
 
-def place(player, line, Local_map):
+def place(player, line, Local_map): #place un pion sur la map
     y = len(Local_map) - 1  # -1 car les indices commencent à 0
     while y >= 0 and Local_map[y][line] != 0:  # Vérifier que y est dans les limites de map
         y = y - 1
@@ -76,14 +76,14 @@ def place(player, line, Local_map):
         Local_map[y][line] = player
         return [line,y]
 
-Patern_list = [
+Patern_list = [ # liste des paternes de detections de victoire
     [0,1],
     [1,0],
     [1,1],
     [1,-1],
 ]
 
-def test_pos(x,y,player,tab):
+def test_pos(x,y,player,tab): #test une position pour un joueur donné
     ret = False
     for i in range(4):
         patern = Patern_list[i]
@@ -114,7 +114,7 @@ def test_pos(x,y,player,tab):
     
     return ret
 
-class neurone:
+class neurone: # les nerones des ia
     def __init__(self,parametres):
         self.parametres = parametres
     
@@ -125,7 +125,7 @@ class neurone:
         for i in range(len(self.parametres)):
             self.parametres[i-1] = self.parametres[i-1] + ((rd.random()-0.5)*Coef*2)
 
-class IA:
+class IA: # les ia
     def __init__(self,parametres):
         self.neurones = [] 
         for i in range(len(parametres)):
@@ -156,55 +156,54 @@ class IA:
                 ret[i].append(o.parametres)
         return ret
 
-def map_to_ia(map):
+def map_to_ia(map): #transforme le format map : [[1,2],[3,4]] au format ia input : [1,2,3,4]
     ret = []
     for i in map :
         for o in i:
             ret.append(o)
     return ret
 
-def party_training(p1,p2,map):
+def party_training(p1,p2,map): # une partie d"entrainement
     local_map = list(map)
-    win = 0
     log = []
     turns = 0
-    while win == 0:
+    while True:
         coup = int(p1.calcul(map_to_ia(local_map))*7)
         if coup == 7 : coup = 6
         log.append(coup)
         pos = place(1,coup,local_map)
         if test_pos(pos[0],pos[1],1,local_map): 
-            win = 1 
             break
 
         coup = int(p2.calcul(map_to_ia(local_map))*7)
         if coup == 7 : coup = 6
         log.append(coup)
         pos = place(2,coup,local_map)
-        if test_pos(pos[0],pos[1],2,local_map) : win = 2
+        if test_pos(pos[0],pos[1],2,local_map) : break
 
         turns = turns + 2
 
         if turns >= 42 :
-            win = None
             break
         
-    return [win,log]
+    return log
 
-def print_map(l_map):
+def print_map(l_map): # print le format map dans la console
     for o in l_map:
         print(o)
 
-def read_log(log,type = "Normal"):
+def read_log(log,type = "Normal"): # lis les log d'une partie
     local_map = Normal_map()
     joueur = 0
     tours = 0
-    for i in log[1]:
+    for i in log:
         joueur = joueur + 1
         if joueur % 2 == 1 :
+            win = 1
             place(1,i,local_map)
             tours = tours + 1
         else:
+            win = 2
             place(2,i,local_map)
         if type == "Normal":
             print("-------------------")
@@ -215,13 +214,13 @@ def read_log(log,type = "Normal"):
         if type == "DT":
             print(log)
         print("-------------------")
-    return [log[0],tours,log[1]]
+    return [win,tours,log]
 
-def setsave(liste):
+def setsave(liste): #fait une sauvegarde
     with open("save.py", "w") as f:
         f.write(str(liste))
 
-def getsave():
+def getsave(): #recupere la sauvegarde ou en crée une nouvelle 
     with open("save.py", "r") as f:
         save = f.read()
         if not save: # save format is [[train evolve,time por mill],IA parms]
@@ -230,7 +229,7 @@ def getsave():
             save = eval(save)
     return save
 
-def afiche(type,donnes=None):
+def afiche(type,donnes=None): # afiche un element graphique
     import kandinsky as ky
     if type == "/100":
         ky.fill_rect(10,10,300,100,ky.color(0,0,0))
@@ -249,7 +248,7 @@ def afiche(type,donnes=None):
         ky.fill_rect(50,5,210,10,ky.color(255,255,255))
         ky.fill_rect(donnes[0]*30+30,5,10,10,ky.color(0,0,0))
 
-def train(iteration,deep = 200,readlog_see = "None"):
+def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainement
     time_por_mill = getsave()[0][1]
     start_time = t.time()
     for i in range(iteration):
@@ -295,10 +294,10 @@ def train(iteration,deep = 200,readlog_see = "None"):
     modif = modif +1 
     setsave([[modif,time_por_mill],[champion[0][0].compil(),champion[1][0].compil(),champion[2][0].compil(),champion[3][0].compil(),champion[4][0].compil()]])
 
-def mass_print(text):
+def mass_print(text):  # permet d'ecrire plein de choses
     for i in text : print(i) 
 
-def select(map):
+def select(map): # permet de choisir au joueur ou vas t'il placer
     import ion
     end = False
     ret = 7
@@ -326,7 +325,7 @@ def select(map):
                 break
     return ret
 
-def Normal_party(type,map,ia = None):
+def Normal_party(type,map,ia = None): # execute une partie contre une ia ou en PVP
     local_map = list(map)
     win = 0
     log = []
@@ -373,7 +372,7 @@ def Normal_party(type,map,ia = None):
                 break
     return [win,log]
 
-def main():
+def main(): # menu principale
     mass_print([
         "---------------------",
         "     puissance 4",
@@ -415,6 +414,6 @@ def main():
             1 : "PVP",
             2 : "PVE"
         }
-        Normal_party(rep_type.get(rep2),Normal_map(),IA(getsave()[1]))
+        Normal_party(rep_type.get(rep2),Normal_map(),IA(getsave()[1][1]))
 
 main()
