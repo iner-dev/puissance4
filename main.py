@@ -290,6 +290,7 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
                     break
             if used == False:
                 champion.insert(0,[o,win,points])
+        setsave([[modif,time_por_mill],[champion[0][0].compil(),champion[1][0].compil(),champion[2][0].compil(),champion[3][0].compil(),champion[4][0].compil()]])
     time_por_mill = (t.time()-start_time)/iteration
     modif = modif +1 
     setsave([[modif,time_por_mill],[champion[0][0].compil(),champion[1][0].compil(),champion[2][0].compil(),champion[3][0].compil(),champion[4][0].compil()]])
