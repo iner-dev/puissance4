@@ -273,27 +273,29 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
             win = 0
             points = 0
             for p in range(4):
-                place = rd.randint(1,2)
-                if place == 1:
-                    ret =  read_log(party_training(o,variantes[rd.randint(0,len(variantes)-1)],Normal_map()),readlog_see)
-                else : 
-                    ret =  read_log(party_training(variantes[rd.randint(0,len(variantes)-1)],o,Normal_map()),readlog_see)
-                points = points + ret[1]
-                if ret[0]==place:
-                    win = win + 1
+                try:
+                    place = rd.randint(1,2)
+                    if place == 1:
+                        ret =  read_log(party_training(o,variantes[rd.randint(0,len(variantes)-1)],Normal_map()),readlog_see)
+                    else : 
+                        ret =  read_log(party_training(variantes[rd.randint(0,len(variantes)-1)],o,Normal_map()),readlog_see)
+                    points = points + ret[1]
+                    if ret[0]==place:
+                        win = win + 1
+                except:
+                    win = win
             used = False
-            for i in range(len(champion)):
-                i = i - 1
-                if champion[i][1] > win or champion[i][2] < points:
-                    champion.insert(i-1,[o,win,points])
+            for Q in range(len(champion)):
+                Q = Q - 1
+                if champion[Q][1] > win or champion[Q][2] < points:
+                    champion.insert(Q-1,[o,win,points])
                     used = True
                     break
             if used == False:
                 champion.insert(0,[o,win,points])
+        modif = modif +1
+        time_por_mill = (t.time()-start_time)/(i+1)
         setsave([[modif,time_por_mill],[champion[0][0].compil(),champion[1][0].compil(),champion[2][0].compil(),champion[3][0].compil(),champion[4][0].compil()]])
-    time_por_mill = (t.time()-start_time)/iteration
-    modif = modif +1 
-    setsave([[modif,time_por_mill],[champion[0][0].compil(),champion[1][0].compil(),champion[2][0].compil(),champion[3][0].compil(),champion[4][0].compil()]])
 
 def mass_print(text):  # permet d'ecrire plein de choses
     for i in text : print(i) 
@@ -382,6 +384,7 @@ def main(): # menu principale
         "  que veut tu faire",
         "1 - entrainer l'ia",
         "2 - une partie",
+        "3 - recuperer la save",
         "---------------------"
     ])
     rep1 = eval(input("> "))
@@ -404,7 +407,7 @@ def main(): # menu principale
             2 : "/100"
         }
         train(rep2,1000,rep_poss.get(rep3))
-    else:
+    elif rep1 == 2 :
         mass_print([
             "1 - PVP",
             "2 - PVE",
@@ -416,5 +419,7 @@ def main(): # menu principale
             2 : "PVE"
         }
         Normal_party(rep_type.get(rep2),Normal_map(),IA(getsave()[1][1]))
+    else : 
+        print(getsave()[1][1])
 
 main()
