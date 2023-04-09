@@ -1,5 +1,4 @@
-import random as rd
-import time as t
+
 
 # PC / NumWorks
 executed_on = "PC"
@@ -16,6 +15,7 @@ executed_on = "PC"
 #      /-82-\ 
 #      \____/ 
 
+parms = 
 
 def Normal_map(): # carte de jeu de base
     return [
@@ -47,22 +47,6 @@ def sigmaoide(tab1): # fait la fonction sigma puis sigmoid
     ret = 1 / (1 + 5 ** (-((4) / len(tab1)) * ret + 2))
     return ret
 
-def randparms(inputs, shema, out): # genere les parametres aleatoire d'une ia
-    ret = []
-    
-    # Ajouter la première couche de poids
-    ret.append([[rd.random() for _ in range(inputs)] for _ in range(shema[0])])
-    
-    # Ajouter les couches de poids suivantes
-    for i in range(1, len(shema)):
-        ret.append([[rd.random() for _ in range(shema[i-1])] for _ in range(shema[i])])
-    
-    # Ajouter les couches de poids finale
-    for i in range(i, i + out):
-        ret.append([[rd.random() for _ in range(shema[i-1])] for _ in range(out)])
-        
-    return ret
-
 def place(player, line, Local_map): #place un pion sur la map
     y = len(Local_map) - 1  # -1 car les indices commencent à 0
     while y >= 0 and Local_map[y][line] != 0:  # Vérifier que y est dans les limites de map
@@ -75,6 +59,10 @@ def place(player, line, Local_map): #place un pion sur la map
     if y >= 0:  # Si y est valide, mettre à jour la valeur de la liste
         Local_map[y][line] = player
         return [line,y]
+
+def print_map(l_map): # print le format map dans la console
+    for o in l_map:
+        print(o)
 
 Patern_list = [ # liste des paternes de detections de victoire
     [0,1],
@@ -120,10 +108,6 @@ class neurone: # les nerones des ia
     
     def calcul(self,input):
         return(sigmaoide(tabs_multiply(self.parametres,input)))
-    
-    def variation(self,Coef):
-        for i in range(len(self.parametres)):
-            self.parametres[i-1] = self.parametres[i-1] + ((rd.random()-0.5)*Coef*2)
 
 class IA: # les ia
     def __init__(self,parametres):
@@ -141,11 +125,6 @@ class IA: # les ia
             for b in range(len(self.neurones[a])):
                 save[a+1].append(self.neurones[a][b].calcul(save[a]))
         return (save[len(save)-1][0])
-    
-    def variation(self,coef):
-        for i in self.neurones : 
-            for o in i :
-                o.variation(coef)
 
     def compil(self):
         ret = []
@@ -162,35 +141,6 @@ def map_to_ia(map): #transforme le format map : [[1,2],[3,4]] au format ia input
         for o in i:
             ret.append(o)
     return ret
-
-def party_training(p1,p2,map): # une partie d"entrainement
-    local_map = list(map)
-    log = []
-    turns = 0
-    while True:
-        coup = int(p1.calcul(map_to_ia(local_map))*7)
-        if coup == 7 : coup = 6
-        log.append(coup)
-        pos = place(1,coup,local_map)
-        if test_pos(pos[0],pos[1],1,local_map): 
-            break
-
-        coup = int(p2.calcul(map_to_ia(local_map))*7)
-        if coup == 7 : coup = 6
-        log.append(coup)
-        pos = place(2,coup,local_map)
-        if test_pos(pos[0],pos[1],2,local_map) : break
-
-        turns = turns + 2
-
-        if turns >= 42 :
-            break
-        
-    return log
-
-def print_map(l_map): # print le format map dans la console
-    for o in l_map:
-        print(o)
 
 def read_log(log,type = "Normal"): # lis les log d'une partie
     local_map = Normal_map()
@@ -216,11 +166,10 @@ def read_log(log,type = "Normal"): # lis les log d'une partie
         print("-------------------")
     return [win,tours,log]
 
-def setsave(liste): #fait une sauvegarde
+
     with open("save.py", "w") as f:
         f.write(str(liste))
 
-def getsave(): #recupere la sauvegarde ou en crée une nouvelle 
     with open("save.py", "r") as f:
         save = f.read()
         if not save: # save format is [[train evolve,time por mill],IA parms]
@@ -247,52 +196,6 @@ def afiche(type,donnes=None): # afiche un element graphique
     elif type == "curseur":
         ky.fill_rect(50,5,210,10,ky.color(255,255,255))
         ky.fill_rect(donnes[0]*30+30,5,10,10,ky.color(0,0,0))
-
-def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainement
-    time_por_mill = getsave()[0][1]
-    start_time = t.time()
-    for i in range(iteration):
-        save = getsave()
-        variantes = [] # [[l'ia variante,log lu,autres donnes -> [la palace de l'ia mere]],...]
-        coef = 1/save[0][0]
-        modif = save[0][0]
-        if readlog_see != "None" and executed_on == "PC" : print("iteration =",i+1)
-        if readlog_see != "None" and executed_on == "PC" : print(100*i/iteration,"%")
-        if executed_on == "NumWorks" and readlog_see == "/100" :afiche("/100",[i/iteration])
-        time_remain = (iteration-i)*deep*time_por_mill/1000
-        if readlog_see != "None" and executed_on == "PC" : print("time remain =",int(time_remain/3600),"h",int(time_remain/60)%60,"and",int(time_remain)%60,"S")
-        if readlog_see != "None" and executed_on == "PC" : print("---------------------")
-        for o in range(4):
-            variantes.append(IA(save[1][o]))
-            for p in range(int(deep/5)):
-                p = p + 1
-                variantes.append(variantes[o])
-                variantes[o+p].variation(coef)
-        champion = []
-        for o in variantes:
-            win = 0
-            points = 0
-            for p in range(4):
-                place = rd.randint(1,2)
-                if place == 1:
-                    ret =  read_log(party_training(o,variantes[rd.randint(0,len(variantes)-1)],Normal_map()),readlog_see)
-                else : 
-                    ret =  read_log(party_training(variantes[rd.randint(0,len(variantes)-1)],o,Normal_map()),readlog_see)
-                points = points + ret[1]
-                if ret[0]==place:
-                    win = win + 1
-            used = False
-            for i in range(len(champion)):
-                i = i - 1
-                if champion[i][1] > win or champion[i][2] < points:
-                    champion.insert(i-1,[o,win,points])
-                    used = True
-                    break
-            if used == False:
-                champion.insert(0,[o,win,points])
-    time_por_mill = (t.time()-start_time)/iteration
-    modif = modif +1 
-    setsave([[modif,time_por_mill],[champion[0][0].compil(),champion[1][0].compil(),champion[2][0].compil(),champion[3][0].compil(),champion[4][0].compil()]])
 
 def mass_print(text):  # permet d'ecrire plein de choses
     for i in text : print(i) 
@@ -377,43 +280,18 @@ def main(): # menu principale
         "---------------------",
         "     puissance 4",
         "      by Iner",
-        "---------------------",
-        "  que veut tu faire",
-        "1 - entrainer l'ia",
-        "2 - une partie",
         "---------------------"
     ])
-    rep1 = eval(input("> "))
-    print("---------------------")
-    if rep1 == 1 :
-        print("et combien d'itérations")
-        print("---------------------")
-        rep2 = eval(input("> "))
-        mass_print([
-            "---------------------",
-            "quelle type d'afichage",
-            "1 - Best",
-            "2 - avancement",
-            "---------------------",
-        ])
-        rep3 = eval(input("> "))
-        print("---------------------")
-        rep_poss = {
-            1 : "Best",
-            2 : "/100"
-        }
-        train(rep2,1000,rep_poss.get(rep3))
-    else:
-        mass_print([
-            "1 - PVP",
-            "2 - PVE",
-            "---------------------"
-        ])
-        rep2 = input("> ")
-        rep_type = {
-            1 : "PVP",
-            2 : "PVE"
-        }
-        Normal_party(rep_type.get(rep2),Normal_map(),IA(getsave()[1][1]))
+    mass_print([
+        "1 - PVP",
+        "2 - PVE",
+        "---------------------"
+    ])
+    rep2 = input("> ")
+    rep_type = {
+        1 : "PVP",
+        2 : "PVE"
+    }
+    Normal_party(rep_type.get(rep2),Normal_map(),IA(parms))
 
 main()
