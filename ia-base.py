@@ -272,7 +272,7 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
         for o in variantes:
             win = 0
             points = 0
-            for p in range(4):
+            for p in range(9):
                 try:
                     place = rd.randint(1,2)
                     if place == 1:
