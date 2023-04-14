@@ -239,7 +239,6 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
         modif = save[0][0]
         if readlog_see != "None" and executed_on == "PC" : print("iteration =",i+1)
         if readlog_see != "None" and executed_on == "PC" : print(100*i/iteration,"%")
-        if executed_on == "NumWorks" and readlog_see == "/100" :afiche("/100",[i/iteration])
         time_remain = (iteration-i)*deep*time_por_mill/1000
         if readlog_see != "None" and executed_on == "PC" : print("time remain =",int(time_remain/3600),"h",int(time_remain/60)%60,"and",int(time_remain)%60,"S")
         if readlog_see != "None" and executed_on == "PC" : print("---------------------")
