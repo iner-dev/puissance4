@@ -250,8 +250,8 @@ def afiche(type,donnes=None): # afiche un element graphique
 
 def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainement
     time_por_mill = getsave()[0][1]
-    start_time = t.time()
     for i in range(iteration):
+        start_time = t.time()
         save = getsave()
         variantes = [] # [[l'ia variante,log lu,autres donnes -> [la palace de l'ia mere]],...]
         coef = 1/save[0][0]
@@ -294,7 +294,7 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
             if used == False:
                 champion.insert(0,[o,win,points])
         modif = modif +1
-        time_por_mill = (t.time()-start_time)/(i+1)
+        time_por_mill = (time_por_mill+t.time()-start_time)/2
         setsave([[modif,time_por_mill],[champion[0][0].compil(),champion[1][0].compil(),champion[2][0].compil(),champion[3][0].compil(),champion[4][0].compil()]])
 
 def mass_print(text):  # permet d'ecrire plein de choses
