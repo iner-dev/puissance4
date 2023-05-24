@@ -1,31 +1,7 @@
 import random as rd
 import time as t
-
-# PC / NumWorks
-executed_on = "PC"
-
-#     puissance 4
-#      by Iner
-
-#       ____  
-#      /    \ 
-#      \-73-/ 
-#       \78/  
-#        --   
-#       /69\  
-#      /-82-\ 
-#      \____/ 
-
-
-def Normal_map(): # carte de jeu de base
-    return [
-        [0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0],
-    ]
+import P4
+import parametres
 
 def tabs_multiply(tab1,tab2): # multiplie les elements de la tab1 par ceux de la tab 2
     ret = []
@@ -61,57 +37,6 @@ def randparms(inputs, shema, out): # genere les parametres aleatoire d'une ia
     for i in range(i, i + out):
         ret.append([[rd.random() for _ in range(shema[i-1])] for _ in range(out)])
         
-    return ret
-
-def place(player, line, Local_map): #place un pion sur la map
-    y = len(Local_map) - 1  # -1 car les indices commencent à 0
-    while y >= 0 and Local_map[y][line] != 0:  # Vérifier que y est dans les limites de map
-        y = y - 1
-        if y < 0:
-            line = line + 1
-            y = len(Local_map) - 1
-            if line >= len(Local_map[0]):
-                line = 0
-    if y >= 0:  # Si y est valide, mettre à jour la valeur de la liste
-        Local_map[y][line] = player
-        return [line,y]
-
-Patern_list = [ # liste des paternes de detections de victoire
-    [0,1],
-    [1,0],
-    [1,1],
-    [1,-1],
-]
-
-def test_pos(x,y,player,tab): #test une position pour un joueur donné
-    ret = False
-    for i in range(4):
-        patern = Patern_list[i]
-        tx = x 
-        ty = y
-        another = True
-        num = 0
-        while another == True and tx >= 0 and tx <= (len(tab[0])-1) and ty >= 0 and ty <= (len(tab)-1):
-            if tab[ty][tx] == player:
-                num = num + 1
-                ty = ty + patern[0]
-                tx = tx + patern[1]
-            else:
-                another = False
-        another = True
-        tx = x 
-        ty = y 
-        while another == True and tx >= 0 and tx <= (len(tab[0])-1) and ty >= 0 and ty <= (len(tab)-1):
-            if tab[ty][tx] == player:
-                num = num + 1
-                ty = ty - patern[0]
-                tx = tx - patern[1]
-            else:
-                another = False
-        num = num - 1
-        if num >= 4 :
-            ret = True
-    
     return ret
 
 class neurone: # les nerones des ia
@@ -171,15 +96,15 @@ def party_training(p1,p2,map): # une partie d"entrainement
         coup = int(p1.calcul(map_to_ia(local_map))*7)
         if coup == 7 : coup = 6
         log.append(coup)
-        pos = place(1,coup,local_map)
-        if test_pos(pos[0],pos[1],1,local_map): 
+        pos = P4.place(1,coup,local_map)
+        if P4.test_pos(pos[0],pos[1],1,local_map): 
             break
 
         coup = int(p2.calcul(map_to_ia(local_map))*7)
         if coup == 7 : coup = 6
         log.append(coup)
-        pos = place(2,coup,local_map)
-        if test_pos(pos[0],pos[1],2,local_map) : break
+        pos = P4.place(2,coup,local_map)
+        if P4.test_pos(pos[0],pos[1],2,local_map) : break
 
         turns = turns + 2
 
@@ -187,34 +112,6 @@ def party_training(p1,p2,map): # une partie d"entrainement
             break
         
     return log
-
-def print_map(l_map): # print le format map dans la console
-    for o in l_map:
-        print(o)
-
-def read_log(log,type = "Normal"): # lis les log d'une partie
-    local_map = Normal_map()
-    joueur = 0
-    tours = 0
-    for i in log:
-        joueur = joueur + 1
-        if joueur % 2 == 1 :
-            win = 1
-            place(1,i,local_map)
-            tours = tours + 1
-        else:
-            win = 2
-            place(2,i,local_map)
-        if type == "Normal":
-            print("-------------------")
-            print_map(local_map)
-    if type == "Normal" or type == "minimal" or type == "DT":
-        print("-------------------")
-        print("J",log[0],"win at",tours,"turns")
-        if type == "DT":
-            print(log)
-        print("-------------------")
-    return [win,tours,log]
 
 def setsave(liste): #fait une sauvegarde
     with open("save.py", "w") as f:
@@ -237,11 +134,12 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
         variantes = [] # [[l'ia variante,log lu,autres donnes -> [la palace de l'ia mere]],...]
         coef = 1/save[0][0]
         modif = save[0][0]
-        if readlog_see != "None" and executed_on == "PC" : print("iteration =",i+1)
-        if readlog_see != "None" and executed_on == "PC" : print(100*i/iteration,"%")
+        if readlog_see != "None" and parametres.executed_on == "PC" : print("iteration =",i+1)
+        if readlog_see != "None" and parametres.executed_on == "PC" : print(100*i/iteration,"%")
+        if parametres.executed_on == "NumWorks" and readlog_see == "/100" :P4.afiche("/100",[i/iteration])
         time_remain = (iteration-i)*deep*time_por_mill/1000
-        if readlog_see != "None" and executed_on == "PC" : print("time remain =",int(time_remain/3600),"h",int(time_remain/60)%60,"and",int(time_remain)%60,"S")
-        if readlog_see != "None" and executed_on == "PC" : print("---------------------")
+        if readlog_see != "None" and parametres.executed_on == "PC" : print("time remain =",int(time_remain/3600),"h",int(time_remain/60)%60,"and",int(time_remain)%60,"S")
+        if readlog_see != "None" and parametres.executed_on == "PC" : print("---------------------")
         for o in range(4):
             variantes.append(IA(save[1][o]))
             for p in range(int(deep/5)):
@@ -256,9 +154,9 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
                 try:
                     place = rd.randint(1,2)
                     if place == 1:
-                        ret =  read_log(party_training(o,variantes[rd.randint(0,len(variantes)-1)],Normal_map()),readlog_see)
+                        ret =  P4.read_log(party_training(o,variantes[rd.randint(0,len(variantes)-1)],P4.Normal_map()),readlog_see)
                     else : 
-                        ret =  read_log(party_training(variantes[rd.randint(0,len(variantes)-1)],o,Normal_map()),readlog_see)
+                        ret =  P4.read_log(party_training(variantes[rd.randint(0,len(variantes)-1)],o,P4.Normal_map()),readlog_see)
                     points = points + ret[1]
                     if ret[0]==place:
                         win = win + 1
@@ -279,39 +177,3 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
 
 def mass_print(text):  # permet d'ecrire plein de choses
     for i in text : print(i) 
-
-def main(): # menu principale
-    mass_print([
-        "---------------------",
-        "     puissance 4",
-        "      by Iner",
-        "---------------------",
-        "  que veut tu faire",
-        "1 - entrainer l'ia",
-        "2 - recuperer la save",
-        "---------------------"
-    ])
-    rep1 = eval(input("> "))
-    print("---------------------")
-    if rep1 == 1 :
-        print("et combien d'itérations")
-        print("---------------------")
-        rep2 = eval(input("> "))
-        mass_print([
-            "---------------------",
-            "quelle type d'afichage",
-            "1 - Best",
-            "2 - avancement",
-            "---------------------",
-        ])
-        rep3 = eval(input("> "))
-        print("---------------------")
-        rep_poss = {
-            1 : "Best",
-            2 : "/100"
-        }
-        train(rep2,1000,rep_poss.get(rep3))
-    else : 
-        print(getsave()[1][1])
-
-main()
