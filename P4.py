@@ -1,3 +1,5 @@
+import iaf
+
 def Normal_map(): # carte de jeu de base
     return [
         [0,0,0,0,0,0,0],
@@ -156,7 +158,7 @@ def Normal_party(type,map,ia = None): # execute une partie contre une ia ou en P
             if coup > 6 : coup = 6
             if coup < 0 : coup = 0
         else:
-            coup = int(ia.calcul(ia.map_to_ia(local_map))*7)
+            coup = iaf.getcoup(ia.calcul(iaf.map_to_ia(local_map)))
             if coup == 7 : coup = 6
         log.append(coup)
         pos = place(2,coup,local_map)

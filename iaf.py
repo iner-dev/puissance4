@@ -81,6 +81,15 @@ class IA: # les ia
                 ret[i].append(o.parametres)
         return ret
 
+def getcoup(proba):
+    Max = 0
+    ret = 0
+    for i in range(len(proba)):
+        if Max < proba[i]: 
+            Max = proba[i]
+            ret = i + 1
+    return ret
+
 def map_to_ia(map): #transforme le format map : [[1,2],[3,4]] au format ia input : [1,2,3,4]
     ret = []
     for i in map :
@@ -93,14 +102,14 @@ def party_training(p1,p2,map): # une partie d"entrainement
     log = []
     turns = 0
     while True:
-        coup = int(p1.calcul(map_to_ia(local_map))*7)
+        coup = getcoup(p1.calcul(map_to_ia(local_map)))
         if coup == 7 : coup = 6
         log.append(coup)
         pos = P4.place(1,coup,local_map)
         if P4.test_pos(pos[0],pos[1],1,local_map): 
             break
 
-        coup = int(p2.calcul(map_to_ia(local_map))*7)
+        coup = getcoup(p2.calcul(map_to_ia(local_map)))
         if coup == 7 : coup = 6
         log.append(coup)
         pos = P4.place(2,coup,local_map)
@@ -121,7 +130,7 @@ def getsave(): #recupere la sauvegarde ou en crée une nouvelle
     with open("save.py", "r") as f:
         save = f.read()
         if not save: # save format is [[train evolve,time por mill],IA parms]
-            save = [[1,7],[randparms(42,[30,20,10,5,3],1),randparms(42,[30,20,10,5,3],1),randparms(42,[30,20,10,5,3],1),randparms(42,[30,20,10,5,3],1),randparms(42,[30,20,10,5,3],1)]]
+            save = [[1,10],[randparms(42,[30,20,10,5,3],7),randparms(42,[30,20,10,5,3],7),randparms(42,[30,20,10,5,3],7),randparms(42,[30,20,10,5,3],7),randparms(42,[30,20,10,5,3],7)]]
         else:
             save = eval(save)
     return save
