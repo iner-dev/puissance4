@@ -34,8 +34,7 @@ def randparms(inputs, shema, out): # genere les parametres aleatoire d'une ia
         ret.append([[rd.random() for _ in range(shema[i-1])] for _ in range(shema[i])])
     
     # Ajouter les couches de poids finale
-    for i in range(i, i + out):
-        ret.append([[rd.random() for _ in range(shema[i-1])] for _ in range(out)])
+    ret.append([[rd.random() for _ in range(shema[i-2])] for _ in range(out)])
         
     return ret
 
@@ -65,7 +64,7 @@ class IA: # les ia
             save.append([])
             for b in range(len(self.neurones[a])):
                 save[a+1].append(self.neurones[a][b].calcul(save[a]))
-        return (save[len(save)-1][0])
+        return (save[len(save)-1])
     
     def variation(self,coef):
         for i in self.neurones : 
@@ -143,12 +142,14 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
         variantes = [] # [[l'ia variante,log lu,autres donnes -> [la palace de l'ia mere]],...]
         coef = 1/save[0][0]
         modif = save[0][0]
-        if readlog_see != "None" and parametres.executed_on == "PC" : print("iteration =",i+1)
-        if readlog_see != "None" and parametres.executed_on == "PC" : print(100*i/iteration,"%")
+        if readlog_see != "None" and parametres.executed_on == "PC" : 
+            print("iteration =",i+1) 
+            print(100*i/iteration,"%")
         if parametres.executed_on == "NumWorks" and readlog_see == "/100" :P4.afiche("/100",[i/iteration])
         time_remain = (iteration-i)*deep*time_por_mill/1000
-        if readlog_see != "None" and parametres.executed_on == "PC" : print("time remain =",int(time_remain/3600),"h",int(time_remain/60)%60,"and",int(time_remain)%60,"S")
-        if readlog_see != "None" and parametres.executed_on == "PC" : print("---------------------")
+        if readlog_see != "None" and parametres.executed_on == "PC" : 
+            print("time remain =",int(time_remain/3600),"h",int(time_remain/60)%60,"and",int(time_remain)%60,"S") 
+            print("---------------------")
         for o in range(4):
             variantes.append(IA(save[1][o]))
             for p in range(int(deep/5)):
