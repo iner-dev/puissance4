@@ -162,7 +162,7 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
             points = 0
             for p in range(9):
                 try:
-                    place = rd.randint(1,2)
+                    place = rd.randint(1,10)
                     if place == 1:
                         ret =  P4.read_log(party_training(o,variantes[rd.randint(0,len(variantes)-1)],P4.Normal_map()),readlog_see)
                     else : 
