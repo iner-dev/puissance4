@@ -52,7 +52,7 @@ def main(): # menu principale
             "2 - PVE",
             "---------------------"
         ])
-        rep2 = input("> ")
+        rep2 = int(input("> "))
         rep_type = {
             1 : "PVP",
             2 : "PVE"
