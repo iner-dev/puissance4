@@ -37,13 +37,15 @@ def main(): # menu principale
             "quelle type d'afichage",
             "1 - Best",
             "2 - avancement",
+            "3 - DT",
             "---------------------",
         ])
         rep3 = eval(input("> "))
         print("---------------------")
         rep_poss = {
             1 : "Best",
-            2 : "/100"
+            2 : "/100",
+            3 : "DT"
         }
         iaf.train(rep2,1000,rep_poss.get(rep3))
     elif rep1 == 2 :

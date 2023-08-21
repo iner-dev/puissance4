@@ -111,7 +111,7 @@ def afiche(type,donnes=None): # afiche un element graphique
 def select(map): # permet de choisir au joueur ou vas t'il placer
     import ion
     end = False
-    ret = 7
+    ret = 42
     while end == False:
         afiche("map",[map])
         afiche("curseur",[ret])

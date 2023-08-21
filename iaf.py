@@ -162,7 +162,7 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
             points = 0
             for p in range(9):
                 try:
-                    place = rd.randint(1,10)
+                    place = rd.randint(1,2)
                     if place == 1:
                         ret =  P4.read_log(party_training(o,variantes[rd.randint(0,len(variantes)-1)],P4.Normal_map()),readlog_see)
                     else : 
@@ -181,7 +181,7 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
                     break
             if used == False:
                 champion.insert(0,[o,win,points])
-        modif = modif +1
+        modif = modif + 0.1
         time_por_mill = (time_por_mill+t.time()-start_time)/2
         setsave([[modif,time_por_mill],[champion[0][0].compil(),champion[1][0].compil(),champion[2][0].compil(),champion[3][0].compil(),champion[4][0].compil()]])
 
