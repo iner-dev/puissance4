@@ -27,7 +27,7 @@ def randparms(inputs, shema, out): # genere les parametres aleatoire d'une ia
     ret = []
     
     # Ajouter la première couche de poids
-    ret.append([[rd.random() for _ in range(inputs)] for _ in range(shema[0])])
+    ret.append([[rd.random() for _ in range(inputs+1)] for _ in range(shema[0])])
     
     # Ajouter les couches de poids suivantes
     for i in range(1, len(shema)):
@@ -60,6 +60,7 @@ class IA: # les ia
     
     def calcul(self,input):
         save = [input]
+        save[0].append(rd.randint(0,6))
         for a in range(len(self.neurones)-1):
             save.append([])
             for b in range(len(self.neurones[a])):
