@@ -158,6 +158,7 @@ def train(iteration,deep = 200,readlog_see = "None"): # une sequance d'entrainem
                 variantes.append(variantes[o])
                 variantes[o+p].variation(coef)
         champion = []
+        for o in range(10): variantes.append(randparms(42,[30,20,10,5,3],7))
         for o in variantes:
             win = 0
             points = 0
